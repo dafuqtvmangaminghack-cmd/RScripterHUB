@@ -1,0 +1,321 @@
+
+--========================================================
+-- RScripterHUB-TESTING-V. 1.0
+-- WINDUI | SINGLE SCRIPT
+-- Author: RScripterHUB Team
+--========================================================
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+
+local Player = Players.LocalPlayer
+local VERSION = "RScripterHUB-TESTING-V. 1.0"
+local DISCORD = "https://discord.gg/4zP4vvTbC"
+
+-- WINDUI
+local WindUI = loadstring(game:HttpGet(
+    "https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
+))()
+
+-- WINDOW
+local Window = WindUI:CreateWindow({
+    Title = VERSION,
+    Author = "RScripterHUB Team",
+    Folder = "RScripterHUB-TESTING-V-1.0",
+    Theme = "Dark",
+    Size = UDim2.fromOffset(580, 440),
+    SideBarWidth = 190,
+    ToggleKey = Enum.KeyCode.P,
+})
+
+-- HELPERS
+local function CreateTab(name, icon)
+    return Window:Tab({
+        Title = name,
+        Icon = icon,
+    })
+end
+
+local function Info(tab, title, description)
+    return tab:Paragraph({
+        Title = title,
+        Desc = description,
+    })
+end
+
+local function Button(tab, title, callback)
+    tab:Button({
+        Title = title,
+        Callback = callback,
+    })
+end
+
+local function Notify(title, content)
+    WindUI:Notify({
+        Title = title,
+        Content = content,
+        Duration = 3,
+    })
+end
+
+-- 01 HOME
+local Home = CreateTab("Home", "house")
+
+Info(Home, VERSION,
+    "Welcome to RScripterHUB!\nStatus: TESTING V. 1.0")
+
+Info(Home, "Developer",
+    "RScripterHUB Team")
+
+Info(Home, "About",
+    "Independent project inspired by Guesting Hub. Not affiliated with its developers.")
+
+Info(Home, "Discord", DISCORD)
+
+Button(Home, "Copy Discord Link", function()
+    if setclipboard then
+        setclipboard(DISCORD)
+        Notify(VERSION, "Discord link copied!")
+    else
+        Notify("Discord", DISCORD)
+    end
+end)
+
+-- 02 UPDATES
+local Updates = CreateTab("Updates", "newspaper")
+
+Info(Updates, "Testing V. 1.0",
+    "• WindUI interface\n• 15 organized tabs\n• Character diagnostics\n• Generator scanner\n• Player information")
+
+-- 03 AUTO BLOCK
+local AutoBlock = CreateTab("Auto Block", "shield")
+
+Info(AutoBlock, "Block Diagnostics",
+    "Local block-system information.")
+
+-- 04 ANTI BAIT
+local AntiBait = CreateTab("Anti Bait Features", "eye")
+
+Info(AntiBait, "Anti Bait",
+    "Local warning and diagnostic information.")
+
+-- 05 STAMINA
+local Stamina = CreateTab("Stamina", "activity")
+
+local HealthInfo = Info(
+    Stamina,
+    "Health Monitor",
+    "Waiting for character..."
+)
+
+local function RefreshHealth()
+    local Character = Player.Character
+    local Humanoid = Character and
+        Character:FindFirstChildOfClass("Humanoid")
+
+    if Humanoid then
+        HealthInfo:SetDesc(
+            "Health: " .. math.floor(Humanoid.Health) ..
+            "\nMax Health: " .. math.floor(Humanoid.MaxHealth)
+        )
+    else
+        HealthInfo:SetDesc("Character unavailable.")
+    end
+end
+
+Button(Stamina, "Refresh Health", RefreshHealth)
+
+task.spawn(function()
+    while task.wait(1) do
+        RefreshHealth()
+    end
+end)
+
+-- 06 PLAYER
+local PlayerTab = CreateTab("Player", "user")
+
+local PlayerInfo = Info(
+    PlayerTab,
+    "Player Information",
+    "Loading..."
+)
+
+local function RefreshPlayer()
+    PlayerInfo:SetDesc(
+        "Username: " .. Player.Name ..
+        "\nDisplay Name: " .. Player.DisplayName ..
+        "\nUser ID: " .. Player.UserId
+    )
+end
+
+Button(PlayerTab, "Refresh Player", RefreshPlayer)
+RefreshPlayer()
+
+-- 07 AIMBOTS
+local Aimbots = CreateTab("Aimbots", "crosshair")
+
+local CameraInfo = Info(
+    Aimbots,
+    "Camera Diagnostics",
+    "Camera information."
+)
+
+Button(Aimbots, "Refresh Camera", function()
+    local Camera = Workspace.CurrentCamera
+
+    if Camera then
+        CameraInfo:SetDesc(
+            "Field Of View: " ..
+            math.floor(Camera.FieldOfView) ..
+            "\nViewport: " .. tostring(Camera.ViewportSize)
+        )
+    end
+end)
+
+-- 08 EXPLOITS / FUN
+local Fun = CreateTab("Exploits/Fun", "gamepad-2")
+
+Info(Fun, "Local Utilities",
+    "Local interface experiments and harmless utilities.")
+
+Button(Fun, "Print Username", function()
+    print(Player.Name)
+    Notify("Player", Player.Name)
+end)
+
+-- 09 ESP
+local ESP = CreateTab("Esp", "scan-eye")
+
+local ESPInfo = Info(
+    ESP,
+    "Player Scanner",
+    "Press scan to count players."
+)
+
+Button(ESP, "Scan Players", function()
+    local Count = #Players:GetPlayers()
+
+    ESPInfo:SetDesc("Players detected: " .. Count)
+    Notify("Player Scanner", tostring(Count))
+end)
+
+-- 10 KILLERS
+local Killers = CreateTab("Killers", "skull")
+
+local KillerInfo = Info(
+    Killers,
+    "Killer Database",
+    "No database loaded."
+)
+
+Button(Killers, "Refresh Database", function()
+    local Count = 0
+
+    for _, Object in ipairs(Workspace:GetDescendants()) do
+        if string.find(string.lower(Object.Name), "killer") then
+            Count += 1
+        end
+    end
+
+    KillerInfo:SetDesc(
+        "Killer-related objects: " .. Count
+    )
+end)
+
+-- 11 SURVIVORS
+local Survivors = CreateTab("Survivors", "users")
+
+local SurvivorInfo = Info(
+    Survivors,
+    "Survivor Database",
+    "No database loaded."
+)
+
+Button(Survivors, "Refresh Database", function()
+    local Count = 0
+
+    for _, Object in ipairs(Workspace:GetDescendants()) do
+        if string.find(string.lower(Object.Name), "survivor") then
+            Count += 1
+        end
+    end
+
+    SurvivorInfo:SetDesc(
+        "Survivor-related objects: " .. Count
+    )
+end)
+
+-- 12 MISC
+local Misc = CreateTab("Misc", "settings")
+
+Info(Misc, "Game Information",
+    "Place ID: " .. game.PlaceId)
+
+Button(Misc, "Check Lighting", function()
+    Notify("Lighting",
+        "Brightness: " .. Lighting.Brightness)
+end)
+
+-- 13 GENERATOR FARM
+local GeneratorFarm = CreateTab("Generator Farm", "factory")
+
+local GeneratorInfo = Info(
+    GeneratorFarm,
+    "Generator Scanner",
+    "Waiting for scan..."
+)
+
+local function ScanGenerators()
+    local Count = 0
+
+    for _, Object in ipairs(Workspace:GetDescendants()) do
+        if string.find(string.lower(Object.Name), "generator") then
+            Count += 1
+        end
+    end
+
+    GeneratorInfo:SetDesc(
+        "Generator objects found: " .. Count
+    )
+
+    Notify("Generator Scanner", tostring(Count))
+end
+
+Button(GeneratorFarm, "Scan Generators", ScanGenerators)
+
+-- 14 AUTO GENERATOR
+local AutoGenerator = CreateTab("Auto Generator", "zap")
+
+Info(AutoGenerator, "Generator Monitor",
+    "Local generator diagnostics.")
+
+Button(AutoGenerator, "Refresh Generator Status",
+    ScanGenerators)
+
+-- 15 CONFIG
+local Config = CreateTab("Config", "sliders")
+
+Info(Config, "Configuration",
+    VERSION .. "\nTheme: Dark\nAuthor: RScripterHUB Team")
+
+Button(Config, "Refresh All Diagnostics", function()
+    RefreshHealth()
+    RefreshPlayer()
+    ScanGenerators()
+
+    Notify(VERSION, "Diagnostics refreshed!")
+end)
+
+Button(Config, "Print Version", function()
+    print(VERSION)
+end)
+
+-- FINISH
+print("======================================")
+print(VERSION)
+print("WINDUI INITIALIZED")
+print("15 TABS CREATED")
+print("======================================")
+
+Notify(VERSION, "Successfully loaded!")
