@@ -1,0 +1,617 @@
+print("Game - Forsaken = True")
+local localPlayer = game:GetService("Players").LocalPlayer
+repeat
+task.wait()
+until localPlayer
+localPlayer.DevTouchCameraMode = Enum.DevTouchCameraMovementMode.Classic
+-- Safe loader for WindUI with retry mechanism to prevent HTTP 504 / timeout crashes
+local lib
+local maxRetries = 3
+local success = false
+for i = 1, maxRetries do
+local ok, result = pcall(function()
+return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+end)
+if ok and result then
+lib = result
+success = true
+break
+else
+warn("Attempt " .. i .. " failed to fetch WindUI library (HTTP Timeout/504). Retrying in 2s...")
+task.wait(2)
+end
+end
+if not success or not lib then
+warn("Failed to load WindUI due to network HTTP 504 timeout.")
+return
+end
+lib:Localization({
+Enabled = true,
+Prefix = "loc:",
+DefaultLanguage = "en",
+Translations = {
+en = {
+WINDUI_EXAMPLE = "RSCRIPTERHUB",
+WELCOME = "By HACKMODSTEAM02xASTROVOIDID",
+LIB_DESC = "RSCRIPTERHUB V. 1.0 TESTING",
+SETTINGS = "Settings",
+APPEARANCE = "Appearance",
+FEATURES = "Features",
+UTILITIES = "Utilities",
+UI_ELEMENTS = "UI Elements",
+CONFIGURATION = "Configuration",
+SAVE_CONFIG = "Save Configuration",
+LOAD_CONFIG = "Load Configuration",
+THEME_SELECT = "Select Theme",
+TRANSPARENCY = "Window Transparency",
+},
+},
+})
+lib.TransparencyValue = 0.2
+lib:SetTheme("Dark")
+local window
+do
+-- Gradient Header displaying Metallic White for Rscripter & Cosmic Purple for HUB
+local function getLogoTitle()
+local function formatGradient(text, colorStart, colorEnd)
+local str = ""
+for i = 1, #text do
+local n = (#text > 1) and ((i - 1) / (#text - 1)) or 0
+local r = math.floor((colorStart.R + (colorEnd.R - colorStart.R) * n) * 255)
+local g = math.floor((colorStart.G + (colorEnd.G - colorStart.G) * n) * 255)
+local b = math.floor((colorStart.B + (colorEnd.B - colorStart.B) * n) * 255)
+str = str .. '<font color="rgb(' .. r .. ',' .. g .. ',' .. b .. ')">' .. text:sub(i, i) .. '</font>'
+end
+return str
+end
+local rscripter = formatGradient("Rscripter", Color3.fromHex("#FFFFFF"), Color3.fromHex("#D8D8D8"))
+local hub = formatGradient("HUB", Color3.fromHex("#C040FF"), Color3.fromHex("#7000FF"))
+local ver = formatGradient(" v1.0", Color3.fromHex("#00E5FF"), Color3.fromHex("#0077FF"))
+return rscripter .. hub .. ver
+end
+lib:Popup({
+Title = "RSCRIPTERHUB Info",
+Icon = "info",
+Content = "RSCRIPTERHUB V. 1.0 Loaded!\nCreated by HACKMODSTEAM02xASTROVOIDID.",
+Buttons = {
+{ Title = "YOOO", Callback = function() end, Variant = "Tertiary" },
+{ Title = "Let's Go", Icon = "arrow-right", Callback = function() end, Variant = "Primary" },
+},
+})
+window = lib:CreateWindow({
+Title = getLogoTitle(),
+Author = "loc:WELCOME",
+Folder = "RscripterHub",
+Size = UDim2.new(0, 320, 0, 320),
+Theme = "Dark",
+Acrylic = true,
+HideSearchBar = false,
+SideBarWidth = 200,
+})
+end
+window:SetToggleKey(Enum.KeyCode.P)
+-- Setup Tabs with Icons
+local tDiscord     = window:Tab({ Title = "Discord | Yaps", Icon = "info" })
+local tUpdates     = window:Tab({ Title = "Updates", Icon = "book" })
+local tAutoBlock   = window:Tab({ Title = "Auto Block", Icon = "shield" })
+local tAntiBait    = window:Tab({ Title = "Anti Bait Features", Icon = "boxes" })
+local tStamina     = window:Tab({ Title = "Stamina", Icon = "zap" })
+local tPlayer      = window:Tab({ Title = "Player", Icon = "person-standing" })
+local tAimbots     = window:Tab({ Title = "Aimbots", Icon = "crosshair" })
+local tExploits    = window:Tab({ Title = "Exploits/Fun", Icon = "hat-glasses" })
+local tEsp         = window:Tab({ Title = "Esp", Icon = "eye" })
+local tKillers     = window:Tab({ Title = "Killers", Icon = "sword" })
+local tSurvivors   = window:Tab({ Title = "Survivors", Icon = "user-round" })
+local tMisc        = window:Tab({ Title = "Misc", Icon = "codesandbox" })
+local tGenFarm     = window:Tab({ Title = "Generator Farm", Icon = "bot-message-square" })
+local tAutoGen     = window:Tab({ Title = "Auto Generator", Icon = "wrench" })
+local tConfig      = window:Tab({ Title = "Config", Icon = "cog" })
+-- Discord | Yaps Tab Content
+tDiscord:Paragraph({
+Title = "JOIN MY SERVER AND YOU CAN SEE UPDATES AND A SNEEK PEEK OF THE SCRIPT",
+Desc = "Join our official community for leaks and script news!"
+})
+tDiscord:Button({
+Title = "OPEN DISCORD SERVER",
+Desc = "Click to copy Discord link: https://discord.gg/4zP4vvTbC",
+Icon = "external-link",
+Callback = function()
+pcall(function()
+if setclipboard then
+setclipboard("https://discord.gg/4zP4vvTbC")
+end
+end)
+lib:Popup({
+Title = "Discord Link",
+Icon = "check",
+Content = "Link copied to clipboard!\nhttps://discord.gg/4zP4vvTbC",
+Buttons = {{ Title = "OK", Variant = "Primary" }}
+})
+end
+})
+tDiscord:Paragraph({
+Title = "Developer Warning (Yaps)",
+Desc = "DO NOT COPY THIS SCRIPT BECAUSE I MADE IT VERY DIFFICULT PLEASE IF SOMEONE ALREADY TOLD YOU, DON'T TELL THE CONTENTS OF THE SCRIPT!?"
+})
+-- Services & Setup
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+-- Comprehensive Animation Database for Enhanced Auto-Block
+getgenv().PunchAnimations = {
+["87259391926321"] = true, ["99100240941590"] = true, ["72685103823181"] = true,
+["81905101227053"] = true, ["113936304594883"] = true, ["140703210927645"] = true,
+["136007065400978"] = true, ["129843313690921"] = true, ["86709774283672"] = true,
+["108807732150251"] = true, ["138040001965654"] = true, ["86096387000557"] = true,
+["119850211147676"] = true, ["131696603025265"] = true, ["119462383658044"] = true,
+["116618003477002"] = true, ["133491532453922"] = true, ["76649505662612"] = true,
+["71190646367497"] = true, ["72182155407310"] = true, ["82605295530067"] = true,
+["138407964761603"] = true, ["133292581373127"] = true, ["116427323741607"] = true,
+["90970641235403"] = true, ["87716278630738"] = true, ["82036084568393"] = true,
+["138936949998619"] = true, ["78440860685556"] = true, ["123825742002486"] = true,
+["125854302746190"] = true, ["132298811847315"] = true, ["135209101640984"] = true,
+["18568553101"] = true, ["423041300"] = true, ["423041325"] = true,
+["423041356"] = true, ["81114852524420"] = true, ["82772022662025"] = true,
+["108911997126897"] = true, ["117216912143451"] = true, ["82137285150006"] = true,
+["102808968188291"] = true, ["116616310968045"] = true, ["117828699507982"] = true,
+}
+-- Network Remote Reference
+local modulesFolder = ReplicatedStorage:FindFirstChild("Modules")
+local networkFolder = modulesFolder and modulesFolder:FindFirstChild("Network")
+local networkSub = networkFolder and networkFolder:FindFirstChild("Network")
+local remoteEvent = networkSub and networkSub:FindFirstChild("RemoteEvent")
+-- Auto Block Settings State
+local blockState = {
+enabled = false,
+audioDetection = false,
+range = 15,
+chance = 100,
+wallCheck = false,
+facingCheck = false,
+delay = 0,
+mode = "Guest1337",
+lastBlock = 0
+}
+local function triggerBlockAction()
+if not remoteEvent then return end
+if (os.clock() - blockState.lastBlock) < 0.15 then return end
+if math.random(1, 100) > blockState.chance then return end
+blockState.lastBlock = os.clock()
+if blockState.delay > 0 then
+task.delay(blockState.delay, function()
+if blockState.mode == "007n7" then
+remoteEvent:FireServer("UseActorAbility", { buffer.fromstring("\3\5\0\0\0Clone") })
+else
+remoteEvent:FireServer("UseActorAbility", { buffer.fromstring("\3\5\0\0\0Block") })
+end
+end)
+else
+if blockState.mode == "007n7" then
+remoteEvent:FireServer("UseActorAbility", { buffer.fromstring("\3\5\0\0\0Clone") })
+else
+remoteEvent:FireServer("UseActorAbility", { buffer.fromstring("\3\5\0\0\0Block") })
+end
+end
+end
+-- Core Auto Block Listener Logic
+local raycastParams = RaycastParams.new()
+raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+raycastParams.IgnoreWater = true
+local function checkWallBetween(origin, targetPos, char)
+if not blockState.wallCheck then return false end
+raycastParams.FilterDescendantsInstances = {char, Workspace:FindFirstChild("Players")}
+local result = Workspace:Raycast(origin, targetPos - origin, raycastParams)
+return result and result.Instance and result.Instance.CanCollide
+end
+local function checkFacing(myHRP, enemyHRP)
+if not blockState.facingCheck then return true end
+local lookVec = myHRP.CFrame.LookVector
+local dirToEnemy = (enemyHRP.Position - myHRP.Position).Unit
+return lookVec:Dot(dirToEnemy) > -0.2
+end
+local function monitorCharacterAnimations(char)
+if not char or char == localPlayer.Character then return end
+local humanoid = char:WaitForChild("Humanoid", 5)
+if not humanoid then return end
+local animator = humanoid:WaitForChild("Animator", 5) or humanoid
+animator.AnimationPlayed:Connect(function(track)
+if not blockState.enabled then return end
+local animId = track.Animation and track.Animation.AnimationId:match("%d+")
+if animId and getgenv().PunchAnimations[animId] then
+local myChar = localPlayer.Character
+local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+local enemyHRP = char:FindFirstChild("HumanoidRootPart")
+if myHRP and enemyHRP then
+local dist = (myHRP.Position - enemyHRP.Position).Magnitude
+if dist <= blockState.range then
+if checkFacing(myHRP, enemyHRP) and not checkWallBetween(myHRP.Position, enemyHRP.Position, myChar) then
+triggerBlockAction()
+end
+end
+end
+end
+end)
+end
+-- Register existing & new player models
+local function bindPlayerModel(model)
+if model:IsA("Model") then
+task.spawn(monitorCharacterAnimations, model)
+end
+end
+task.spawn(function()
+local playersFolder = Workspace:WaitForChild("Players", 5)
+if playersFolder then
+for _, grp in ipairs({"Killers", "Survivors"}) do
+local sub = playersFolder:FindFirstChild(grp)
+if sub then
+for _, model in ipairs(sub:GetChildren()) do bindPlayerModel(model) end
+sub.ChildAdded:Connect(bindPlayerModel)
+end
+end
+end
+end)
+-- UI Controls in Auto Block Tab
+tAutoBlock:Toggle({
+Title = "Enable Auto Block",
+Default = false,
+Callback = function(v) blockState.enabled = v end
+})
+tAutoBlock:Toggle({
+Title = "Audio Detection",
+Default = false,
+Callback = function(v) blockState.audioDetection = v end
+})
+tAutoBlock:Toggle({
+Title = "Wall Check",
+Default = false,
+Callback = function(v) blockState.wallCheck = v end
+})
+tAutoBlock:Toggle({
+Title = "Facing Check",
+Default = false,
+Callback = function(v) blockState.facingCheck = v end
+})
+tAutoBlock:Slider({
+Title = "Detection Range (Studs)",
+Min = 5, Max = 40, Default = 15,
+Callback = function(v) blockState.range = v end
+})
+tAutoBlock:Slider({
+Title = "Auto Block Chance (%)",
+Min = 1, Max = 100, Default = 100,
+Callback = function(v) blockState.chance = v end
+})
+-- CATSAKEN STAMINA SYSTEM INTEGRATION
+local staminaSettings = {
+InfiniteStamina = false,
+CustomStaminaEnabled = false,
+MaxStamina = 100,
+StaminaGain = 20,
+StaminaLoss = 10,
+SprintSpeed = 24
+}
+-- Safe Sprinting Module Hook
+local SprintingModule = nil
+pcall(function()
+local systems = ReplicatedStorage:FindFirstChild("Systems")
+local character = systems and systems:FindFirstChild("Character")
+local gameFolder = character and character:FindFirstChild("Game")
+local sprinting = gameFolder and gameFolder:FindFirstChild("Sprinting")
+if sprinting then
+SprintingModule = require(sprinting)
+end
+end)
+task.spawn(function()
+while true do
+task.wait(0.1)
+if SprintingModule then
+pcall(function()
+if staminaSettings.InfiniteStamina then
+SprintingModule.StaminaLossDisabled = true
+SprintingModule.Stamina = SprintingModule.MaxStamina or 100
+else
+SprintingModule.StaminaLossDisabled = false
+end
+if staminaSettings.CustomStaminaEnabled then
+SprintingModule.MaxStamina = staminaSettings.MaxStamina
+SprintingModule.StaminaGain = staminaSettings.StaminaGain
+SprintingModule.StaminaLoss = staminaSettings.StaminaLoss
+SprintingModule.SprintSpeed = staminaSettings.SprintSpeed
+end
+end)
+end
+end
+end)
+-- Stamina Tab Controls
+tStamina:Paragraph({
+Title = "Stamina & Movement Manager",
+Desc = "Manage your stamina drain, recovery rate, and sprint speed."
+})
+tStamina:Toggle({
+Title = "Infinite Stamina",
+Default = false,
+Callback = function(v)
+staminaSettings.InfiniteStamina = v
+if SprintingModule and not v then
+pcall(function() SprintingModule.StaminaLossDisabled = false end)
+end
+end
+})
+tStamina:Toggle({
+Title = "Enable Custom Stamina Stats",
+Default = false,
+Callback = function(v)
+staminaSettings.CustomStaminaEnabled = v
+end
+})
+tStamina:Slider({
+Title = "Max Stamina",
+Min = 50, Max = 500, Default = 100,
+Callback = function(v)
+staminaSettings.MaxStamina = v
+end
+})
+tStamina:Slider({
+Title = "Stamina Gain Rate",
+Min = 5, Max = 100, Default = 20,
+Callback = function(v)
+staminaSettings.StaminaGain = v
+end
+})
+tStamina:Slider({
+Title = "Stamina Loss Rate",
+Min = 0, Max = 50, Default = 10,
+Callback = function(v)
+staminaSettings.StaminaLoss = v
+end
+})
+tStamina:Slider({
+Title = "Sprint Speed",
+Min = 16, Max = 60, Default = 24,
+Callback = function(v)
+staminaSettings.SprintSpeed = v
+end
+})
+-- CATSAKEN ESP ENGINE INTEGRATION (FULL ITEMS, PROJECTILES, TRAPS & GEARS)
+local espSettings = {
+EspKiller = false,
+EspSurv = false,
+EspGen = false,
+EspItem = false,
+EspGear = false,
+EspProjectile = false,
+EspTrap = false,
+OutlineOnly = false,
+NoOutline = false,
+KillerColor = Color3.fromRGB(255, 0, 0),
+SurvColor = Color3.fromRGB(0, 100, 255),
+GenColor = Color3.fromRGB(221, 51, 255),
+ItemColor = Color3.fromRGB(0, 255, 255),
+GearColor = Color3.fromRGB(255, 165, 0),
+ProjectileColor = Color3.fromRGB(255, 230, 0),
+TrapColor = Color3.fromRGB(255, 50, 120)
+}
+local espCache = {}
+local gearCache = {}
+local function dropEsp(model)
+local data = espCache[model]
+if data then
+pcall(function() if data.hl then data.hl:Destroy() end end)
+pcall(function() if data.bb then data.bb:Destroy() end end)
+espCache[model] = nil
+end
+end
+local function makeEsp(model, color, textFunc, customRoot)
+if not model or not model.Parent then return nil end
+local cached = espCache[model]
+if cached then
+if cached.hl then
+cached.hl.FillColor = color
+cached.hl.OutlineColor = color
+end
+return cached
+end
+local success, data = pcall(function()
+local hl = Instance.new("Highlight")
+hl.Name = "RS_ESP_HL"
+hl.Adornee = model
+hl.FillColor = color
+hl.OutlineColor = color
+hl.FillTransparency = espSettings.OutlineOnly and 1 or 0.7
+hl.OutlineTransparency = espSettings.NoOutline and 1 or 0
+hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+hl.Parent = model
+local root = customRoot or model:FindFirstChild("HumanoidRootPart")
+or model:FindFirstChild("ItemRoot")
+or model:FindFirstChild("Main")
+or model.PrimaryPart
+or (model:IsA("BasePart") and model)
+or model:FindFirstChildWhichIsA("BasePart", true)
+local bb, lbl = nil, nil
+if root then
+bb = Instance.new("BillboardGui")
+bb.Name = "RS_ESP_BB"
+bb.Adornee = root
+bb.Size = UDim2.new(0, 200, 0, 30)
+bb.StudsOffset = Vector3.new(0, 3, 0)
+bb.AlwaysOnTop = true
+bb.Parent = root
+lbl = Instance.new("TextLabel")
+lbl.Size = UDim2.new(1, 0, 1, 0)
+lbl.BackgroundTransparency = 1
+lbl.TextColor3 = color
+lbl.TextStrokeTransparency = 0
+lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+lbl.TextSize = 12
+lbl.Font = Enum.Font.GothamBold
+lbl.Parent = bb
+end
+return { hl = hl, bb = bb, lbl = lbl, textFunc = textFunc, color = color }
+end)
+if success and data then
+espCache[model] = data
+return data
+end
+return nil
+end
+-- Gear Detection Prompt Listener
+local function checkGearPrompt(prompt)
+if not prompt:IsA("ProximityPrompt") then return false end
+local act = (prompt.ActionText or ""):lower()
+local obj = (prompt.ObjectText or ""):lower()
+return act:find("gear") or obj:find("gear") or act:find("齿轮") or obj:find("齿轮")
+end
+local function registerGearPrompt(prompt)
+if not checkGearPrompt(prompt) then return end
+local part = prompt.Parent
+if part and part:IsA("Attachment") then part = part.Parent end
+if part and part:IsA("BasePart") then
+local model = part:FindFirstAncestorOfClass("Model") or part
+gearCache[model] = { part = part, prompt = prompt }
+end
+end
+Workspace.DescendantAdded:Connect(function(inst)
+if inst:IsA("ProximityPrompt") then task.defer(registerGearPrompt, inst) end
+end)
+task.spawn(function()
+for _, inst in ipairs(Workspace:GetDescendants()) do
+if inst:IsA("ProximityPrompt") then registerGearPrompt(inst) end
+end
+end)
+-- Projectile & Trap Name Dictionaries
+local projectileKeywords = {
+"pizza", "corruptenergy", "massinfection", "entanglement", "nova",
+"projectile", "dagger", "spike", "gashing", "walkspeed", "spear", "wave"
+}
+local trapKeywords = {
+"digitalfootprint", "footprint", "tripwire", "trap", "mine",
+"sentry", "dispenser", "minion", "zombie", "clone", "subspace"
+}
+local function matchesKeywordList(nameStr, list)
+local lower = nameStr:lower()
+for _, kw in ipairs(list) do
+if lower:find(kw) then
+return true
+end
+end
+return false
+end
+-- Main Background ESP Loop
+task.spawn(function()
+while true do
+task.wait(0.5)
+pcall(function()
+for m, _ in pairs(espCache) do
+if not m or not m.Parent then dropEsp(m) end
+end
+end)
+local activeMap = {}
+-- Generator ESP
+if espSettings.EspGen then
+pcall(function()
+local mapFolder = Workspace:FindFirstChild("Map")
+local inGame = mapFolder and mapFolder:FindFirstChild("Ingame")
+local map = inGame and inGame:FindFirstChild("Map")
+if map then
+for _, o in ipairs(map:GetChildren()) do
+if o.Name == "Generator" and o:FindFirstChild("Main") then
+activeMap[o] = {
+color = espSettings.GenColor,
+text = function()
+local p = o:FindFirstChild("Progress") and o.Progress.Value or 0
+return string.format("Generator [%d%%]", p)
+end
+}
+end
+end
+end
+end)
+end
+-- Player ESP (Killers & Survivors)
+local playersFolder = Workspace:FindFirstChild("Players")
+if playersFolder then
+local kFolder = playersFolder:FindFirstChild("Killers")
+local sFolder = playersFolder:FindFirstChild("Survivors")
+if kFolder and espSettings.EspKiller then
+pcall(function()
+for _, m in ipairs(kFolder:GetChildren()) do
+if m:IsA("Model") and m ~= localPlayer.Character then
+activeMap[m] = {
+color = espSettings.KillerColor,
+text = function()
+local h = m:FindFirstChildOfClass("Humanoid")
+return string.format("[Killer] %s %s", m.Name, h and string.format("(%d HP)", math.floor(h.Health)) or "")
+end
+}
+end
+end
+end)
+end
+if sFolder and espSettings.EspSurv then
+pcall(function()
+for _, m in ipairs(sFolder:GetChildren()) do
+if m:IsA("Model") and m ~= localPlayer.Character then
+activeMap[m] = {
+color = espSettings.SurvColor,
+text = function()
+local h = m:FindFirstChildOfClass("Humanoid")
+return string.format("[Survivor] %s %s", m.Name, h and string.format("(%d HP)", math.floor(h.Health)) or "")
+end
+}
+end
+end
+end)
+end
+end
+-- Items ESP (Medkit, Bloxy Cola, Tools)
+if espSettings.EspItem then
+pcall(function()
+local seen = {}
+local function inspectItem(o)
+if seen[o] or not (o:IsA("Model") or o:IsA("Tool")) then return end
+local n = o.Name:lower()
+if n:find("medkit") or n:find("bloxy") or n:find("cola") or n:find("item") then
+seen[o] = true
+activeMap[o] = {
+color = espSettings.ItemColor,
+text = function()
+if n:find("medkit") then return "Medkit"
+elseif n:find("bloxy") or n:find("cola") then return "Bloxy Cola"
+else return o.Name end
+end
+}
+end
+end
+for _, o in ipairs(Workspace:GetChildren()) do inspectItem(o) end
+local mapFolder = Workspace:FindFirstChild("Map")
+if mapFolder then
+for _, o in ipairs(mapFolder:GetDescendants()) do inspectItem(o) end
+end
+end)
+end
+-- Gear ESP
+if espSettings.EspGear then
+pcall(function()
+for model, data in pairs(gearCache) do
+if not model.Parent or not data.part.Parent then
+gearCache[model] = nil
+dropEsp(model)
+else
+activeMap[model] = {
+color = espSettings.GearColor,
+text = function() return "Gear" end,
+customRoot = data.part
+}
+end
+end
+end)
+end
+-- Projectiles & Traps/Minions ESP (CatSaken v4.1 style scanning)
+if espSettings.EspProjectile or espSettings.EspTrap then
+pcall(function()
+local containers = { Workspace }
+local mapFolder = Workspace:FindFirstChild("Map")
+local inGame = mapFolder and mapFolder:FindFirstChild("Ingame")
+if inGame then table.insert(containers, inGame) end
+local effectsFolder = Workspace:FindFirstChild("Effects") or Wor
