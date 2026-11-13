@@ -173,6 +173,8 @@ delay = 0,
 mode = "Guest1337",
 lastBlock = 0
 }
+local clonePayload = string.char(3, 5, 0, 0, 0) .. "Clone"
+local blockPayload = string.char(3, 5, 0, 0, 0) .. "Block"
 local function triggerBlockAction()
 if not remoteEvent then return end
 if (os.clock() - blockState.lastBlock) < 0.15 then return end
@@ -181,16 +183,16 @@ blockState.lastBlock = os.clock()
 if blockState.delay > 0 then
 task.delay(blockState.delay, function()
 if blockState.mode == "007n7" then
-remoteEvent:FireServer("UseActorAbility", { buffer.fromstring("\3\5\0\0\0Clone") })
+remoteEvent:FireServer("UseActorAbility", { buffer.fromstring(clonePayload) })
 else
-remoteEvent:FireServer("UseActorAbility", { buffer.fromstring("\3\5\0\0\0Block") })
+remoteEvent:FireServer("UseActorAbility", { buffer.fromstring(blockPayload) })
 end
 end)
 else
 if blockState.mode == "007n7" then
-remoteEvent:FireServer("UseActorAbility", { buffer.fromstring("\3\5\0\0\0Clone") })
+remoteEvent:FireServer("UseActorAbility", { buffer.fromstring(clonePayload) })
 else
-remoteEvent:FireServer("UseActorAbility", { buffer.fromstring("\3\5\0\0\0Block") })
+remoteEvent:FireServer("UseActorAbility", { buffer.fromstring(blockPayload) })
 end
 end
 end
@@ -613,5 +615,4 @@ pcall(function()
 local containers = { Workspace }
 local mapFolder = Workspace:FindFirstChild("Map")
 local inGame = mapFolder and mapFolder:FindFirstChild("Ingame")
-if inGame then table.insert(containers, inGame) end
-local effectsFolder = Workspace:FindFirstChild("Effects") or Wor
+if inGame then ta
